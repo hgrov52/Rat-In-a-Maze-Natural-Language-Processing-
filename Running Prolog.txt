@@ -1,0 +1,2 @@
+$ swipl
+?- consult('<filename>.pl').

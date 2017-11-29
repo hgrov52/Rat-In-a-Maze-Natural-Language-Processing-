@@ -1,4 +1,4 @@
-:- module(mazeSolver, []).
+:- module(mazeSolver, [main/0]).
 :- use_module(mazeInfo,[info/3, wall/2, button/3, num_buttons/1, start/2, goal/2]).
 
 
@@ -63,14 +63,20 @@ simulateB(StartX, StartY, ButtonNum) :-
 
 simulateC(StartX, StartY, ButtonNum) :- 
 	write("Sim C"),nl,
-	%mazeInfo:num_buttons
-	%( ButtonNum > 
+	mazeInfo:num_buttons(N),
+	mazeInfo:goal(GoalX,GoalY),
 
+	( (ButtonNum > N) -> findPath(StartX, StartY, GoalX, GoalY,true);write("")),
 
+	mazeInfo:button(ButtonX,ButtonY,ButtonNum),
 
-	mazeInfo:button(X,Y,ButtonNum),
-	write("Button "),write(1),write(" is at: "),write(X),write(","),write(Y),nl,
-	write("").
+	write("Button "),write(1),write(" is at: "),write(ButtonX),write(","),write(ButtonY),nl,
+	write(""),
+
+	findPath(StartX, StartY, ButtonX, ButtonY,false).
+
+findPath(StartX,StartY,EndX,EndY,FindingGoal) :-
+	write("In find path").
 
 
 % Will there be boards without buttons?

@@ -63,9 +63,13 @@ simulateB(StartX, StartY, ButtonNum) :-
 
 simulateC(StartX, StartY, ButtonNum) :- 
 	write("Sim C"),nl,
+	%mazeInfo:num_buttons
+	%( ButtonNum > 
 
-	mazeInfo:button(V,Z,1),
-	write("Button "),write(1),write(" is at: "),write(V),write(","),write(Z),nl,
+
+
+	mazeInfo:button(X,Y,ButtonNum),
+	write("Button "),write(1),write(" is at: "),write(X),write(","),write(Y),nl,
 	write("").
 
 

@@ -40,6 +40,8 @@ part1() :-
 				% Label certain locations as bad to prevent moving there again
 				% Until you havent hit all buttons, path find
 				% find path will use recursive path finder until goal is found
+	
+	% get info from the info module
 	mazeInfo:info(W,H,Type),
 	mazeInfo:start(X,Y),
 	mazeInfo:num_buttons(N),
@@ -47,7 +49,7 @@ part1() :-
 	write("The board is "),write(W),write(" by "),write(H),write(" and is type "),write(Type),nl,
 	write("The start point is: "),write(X),write(","),write(Y),nl,
 	
-
+	% if statement syntax
 	( isA(Type) -> simulateA(X,Y) ; simulateC(X,Y,1) ).
 
 simulateA(StartX, StartY) :- 

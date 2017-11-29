@@ -46,7 +46,7 @@ part1() :-
 	mazeInfo:start(X,Y),
 	mazeInfo:num_buttons(N),
 
-	write("The board is "),write(W),write(" by "),write(H),write(" and is type "),write(Type),nl,
+	write("The board is "),write(W),write(" by "),write(H),write(" and is type "),write(Type),write(" and has "),write(N),write( " buttons"), nl,
 	write("The start point is: "),write(X),write(","),write(Y),nl,
 	
 	% if statement syntax
@@ -62,21 +62,36 @@ simulateB(StartX, StartY, ButtonNum) :-
 	simulateC(StartX, StartY, ButtonNum).
 
 simulateC(StartX, StartY, ButtonNum) :- 
-	write("Sim C"),nl,
+	nl,write("Sim C"),nl,
 	mazeInfo:num_buttons(N),
 	mazeInfo:goal(GoalX,GoalY),
 
-	( (ButtonNum > N) -> findPath(StartX, StartY, GoalX, GoalY,true);write("")),
+	( (ButtonNum > N) -> findPath(StartX, StartY, GoalX, GoalY, [], true);write("")),
+
+	write("looking for button number "),write(ButtonNum),nl,
 
 	mazeInfo:button(ButtonX,ButtonY,ButtonNum),
 
 	write("Button "),write(1),write(" is at: "),write(ButtonX),write(","),write(ButtonY),nl,
 	write(""),
 
-	findPath(StartX, StartY, ButtonX, ButtonY,false).
+	findPath(StartX, StartY, ButtonX, ButtonY,[], false).
 
-findPath(StartX,StartY,EndX,EndY,FindingGoal) :-
-	write("In find path").
+findPath(StartX,StartY,EndX,EndY,Path,FindingGoal) :-
+	write("In find path"),
+
+	(mazeInfo:goal(StartX,StartY) -> printPath(Path) ; write("")),
+
+
+
+
+
+	write("").
+
+printPath(Path) :-
+	write("printing path").
+
+
 
 
 % Will there be boards without buttons?

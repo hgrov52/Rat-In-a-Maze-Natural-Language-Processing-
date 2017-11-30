@@ -6,6 +6,35 @@ isA(a).
 isB(b).
 isC(c).
 
+equal(X,Y) :-
+	X=:=Y.
+
+notEqualToLastLoc(X,Y,LastX,LastY) :-
+	(equal(X,LastX),equal(Y,LastY) -> false; true).
+
+
+isValid(X,Y,LastX,LastY) :-
+	mazeInfo:info(W,H,Type),
+
+	(X < 0 -> false;write("")),
+	(Y < 0 -> false;write("")),
+	(X > W-1 -> false;write("")),
+	(Y > H-1 -> false;write("")),
+
+	notEqualToLastLoc(X,Y,LastX,LastY),
+
+	(mazeInfo:wall(X,Y)->false;true),
+
+	true.
+
+
+inc(X,X1) :-
+	X1 is X+1.
+
+dec(X,X1) :-
+	X1 is X-1.
+	
+
 
 main :-
 
@@ -50,7 +79,10 @@ part1() :-
 	write("The start point is: "),write(X),write(","),write(Y),nl,
 	
 	% if statement syntax
-	( isA(Type) -> simulateA(X,Y) ; simulateC(X,Y,1) ).
+	( isA(Type) -> simulateA(X,Y) ; simulateC(X,Y,1) ),
+	
+
+	write("end").
 
 simulateA(StartX, StartY) :- 
 	write("Sim A"),nl.
@@ -62,34 +94,69 @@ simulateB(StartX, StartY, ButtonNum) :-
 	simulateC(StartX, StartY, ButtonNum).
 
 simulateC(StartX, StartY, ButtonNum) :- 
-	nl,write("Sim C"),nl,
+	%nl,write("Sim C"),nl,
 	mazeInfo:num_buttons(N),
 	mazeInfo:goal(GoalX,GoalY),
-
-	( (ButtonNum > N) -> findPath(StartX, StartY, GoalX, GoalY, [], true);write("")),
+	write("N: "),write(N),nl,
+	% If the Button ID is greater than the number of buttons, then find a path to the goal
+	write("Goal "),write(GoalX),write(","),write(GoalY),
+	nl,
+	( (ButtonNum > N) -> findPath(StartX, StartY, GoalX, GoalY, [], -1,-1,ButtonNum,true);write("")),
 
 	write("looking for button number "),write(ButtonNum),nl,
 
 	mazeInfo:button(ButtonX,ButtonY,ButtonNum),
 
-	write("Button "),write(1),write(" is at: "),write(ButtonX),write(","),write(ButtonY),nl,
+	write("Button "),write(ButtonNum),write(" is at: "),write(ButtonX),write(","),write(ButtonY),nl,
 	write(""),
 
-	findPath(StartX, StartY, ButtonX, ButtonY,[], false).
+	findPath(StartX, StartY, ButtonX, ButtonY,[], -1,-1,ButtonNum,false).
 
-findPath(StartX,StartY,EndX,EndY,Path,FindingGoal) :-
-	write("In find path"),
+findPath(StartX,StartY,EndX,EndY,Path,LastX,LastY,ButtonNum,FindingGoal) :-
+	%write("In find path at "),write(StartX),write(","),write(StartY), nl,
+	
+	(equal(StartX,EndX),equal(StartY,EndY),FindingGoal -> printLastPath(StartX,StartY,ButtonNum,Path) ; write("")),
+	
 
-	(mazeInfo:goal(StartX,StartY) -> printPath(Path) ; write("")),
+	(equal(StartX,EndX),equal(StartY,EndY) -> printPath(StartX,StartY,ButtonNum,Path) ; write("")),
 
+
+	inc(StartX,StartXPlusOne),
+	inc(StartY,StartYPlusOne),
+	dec(StartX,StartXMinusOne),
+	dec(StartY,StartYMinusOne),
+	
+	( isValid(StartX,StartYPlusOne,LastX,LastY) -> findPath(StartX,StartYPlusOne, EndX,EndY,append(Path,[StartX,StartY]),StartX,StartY,ButtonNum,FindingGoal);write("")),
+
+	( isValid(StartXPlusOne,StartY,LastX,LastY) -> findPath(StartXPlusOne,StartY, EndX,EndY,append(Path,[StartX,StartY]),StartX,StartY,ButtonNum,FindingGoal);write("")),
+	( isValid(StartXMinusOne,StartY,LastX,LastY) -> findPath(StartXMinusOne,StartY, EndX,EndY,append(Path,[StartX,StartY]),StartX,StartY,ButtonNum,FindingGoal);write("")),
+	( isValid(StartX,StartYMinusOne,LastX,LastY) -> findPath(StartX,StartYMinusOne, EndX,EndY,append(Path,[StartX,StartY]),StartX,StartY,ButtonNum,FindingGoal);write("")),
 
 
 
 
 	write("").
 
-printPath(Path) :-
-	write("printing path").
+print([]):-
+	write("").
+print(H|T):-
+	write(H),
+	print(T).
+
+
+printPath(X,Y,ButtonNum,Path) :-
+	write("printing path"),nl,
+	print(Path),
+
+	inc(ButtonNum,NewButtonNum),
+	simulateC(X,Y,NewButtonNum).
+
+printLastPath(X,Y,ButtonNum,Path) :-
+	write("done"),nl,
+
+	write("ButtonNum is "),write(ButtonNum),
+
+	fail.
 
 
 

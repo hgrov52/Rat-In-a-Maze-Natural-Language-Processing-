@@ -3,7 +3,6 @@
 
 
 isA(a).
-isB(b).
 isC(c).
 
 equal(X,Y) :-
@@ -14,7 +13,7 @@ notEqualToLastLoc(X,Y,LastX,LastY) :-
 
 
 isValid(X,Y,LastX,LastY) :-
-	mazeInfo:info(W,H,Type),
+	mazeInfo:info(W,H,_),
 
 	(X < 0 -> false;write("")),
 	(Y < 0 -> false;write("")),
@@ -34,74 +33,36 @@ inc(X,X1) :-
 dec(X,X1) :-
 	X1 is X-1.
 	
-
-
 main :-
 
-	
-	part1().
-
-	
-
-part1() :-
-	% info (Width, Height, Test Type (a, b, or c))
-	% wall (X coordinate, Y coordinate)
-	% button (X coordinate, Y coordinate, Button ID (for button order))
-	% num_buttons (number of buttons in the maze)
-	% start (X coordinate, Y coordinate)
-	% goal (X coordinate, Y coordinate)
-
-	% Plan: develop solution for test type c
-		% Needed Functions:
-
-			% Main functions
-
-				% findNextButton
-				% findGoal 
-				% findPath(X,Y) given current location
-
-			% Helper Functions:
-
-				% getPossibleMoveDirections(X,Y) given current location
-				% 
-
-			% Concepts 
-				% Label certain locations as bad to prevent moving there again
-				% Until you havent hit all buttons, path find
-				% find path will use recursive path finder until goal is found
-	
 	% get info from the info module
 	mazeInfo:info(W,H,Type),
 	mazeInfo:start(X,Y),
 	mazeInfo:num_buttons(N),
 
+	%Stream is the output file to write to  
+    open('path-solution.txt',write, Stream),
+
 	write("The board is "),write(W),write(" by "),write(H),write(" and is type "),write(Type),write(" and has "),write(N),write( " buttons"), nl,
-	write("The start point is: "),write(X),write(","),write(Y),nl,
+	write("The start point is: "),write(X),write(","),write(Y),nl,nl,
 	
 	% if statement syntax
-	( isA(Type) -> simulateA(X,Y) ; simulateC(X,Y,1) ),
+	( isA(Type) -> simulateA(X,Y,Stream) ; simulateC(X,Y,1,Stream) ),
 	
 
 	write("end").
 
-simulateA(StartX, StartY) :- 
-	write("Sim A"),nl.
+simulateA(StartX, StartY,_) :- 
+	write("Sim A"),nl,
+	write("Starts at "),write(StartX),write(","),write(StartY),nl.
 
-simulateB(StartX, StartY, ButtonNum) :-
-	write("Sim B"),nl,
-	write("This is also a valid path under Sim C.."),nl,
-	write("Passing to "),
-	simulateC(StartX, StartY, ButtonNum).
-
-simulateC(StartX, StartY, ButtonNum) :- 
+simulateC(StartX, StartY, ButtonNum,Stream) :- 
 	%nl,write("Sim C"),nl,
 	mazeInfo:num_buttons(N),
 	mazeInfo:goal(GoalX,GoalY),
-	write("N: "),write(N),nl,
+	
 	% If the Button ID is greater than the number of buttons, then find a path to the goal
-	write("Goal "),write(GoalX),write(","),write(GoalY),
-	nl,
-	( (ButtonNum > N) -> findPath(StartX, StartY, GoalX, GoalY, [], -1,-1,ButtonNum,true);write("")),
+	( (ButtonNum > N) -> format('Goal is at ~w,~w~n',[GoalX,GoalY]),findPath(StartX, StartY, GoalX, GoalY, [], -1,-1,ButtonNum,true,Stream);write("")),
 
 	write("looking for button number "),write(ButtonNum),nl,
 
@@ -110,55 +71,57 @@ simulateC(StartX, StartY, ButtonNum) :-
 	write("Button "),write(ButtonNum),write(" is at: "),write(ButtonX),write(","),write(ButtonY),nl,
 	write(""),
 
-	findPath(StartX, StartY, ButtonX, ButtonY,[], -1,-1,ButtonNum,false).
+	findPath(StartX, StartY, ButtonX, ButtonY,[], -1,-1,ButtonNum,false,Stream).
 
-findPath(StartX,StartY,EndX,EndY,Path,LastX,LastY,ButtonNum,FindingGoal) :-
+findPath(StartX,StartY,EndX,EndY,Path,LastX,LastY,ButtonNum,FindingGoal,Stream) :-
 	%write("In find path at "),write(StartX),write(","),write(StartY), nl,
 	
-	(equal(StartX,EndX),equal(StartY,EndY),FindingGoal -> printLastPath(StartX,StartY,ButtonNum,Path) ; write("")),
+	(equal(StartX,EndX),equal(StartY,EndY),FindingGoal -> printLastPath(StartX,StartY,Path,Stream) ; write("")),
 	
 
-	(equal(StartX,EndX),equal(StartY,EndY) -> printPath(StartX,StartY,ButtonNum,Path) ; write("")),
-
+	(equal(StartX,EndX),equal(StartY,EndY) -> printPath(StartX,StartY,ButtonNum,Path,Stream) ; write("")),
 
 	inc(StartX,StartXPlusOne),
 	inc(StartY,StartYPlusOne),
 	dec(StartX,StartXMinusOne),
 	dec(StartY,StartYMinusOne),
+
+	append(Path,[[StartX,StartY]],NewPath),
 	
-	( isValid(StartX,StartYPlusOne,LastX,LastY) -> findPath(StartX,StartYPlusOne, EndX,EndY,append(Path,[StartX,StartY]),StartX,StartY,ButtonNum,FindingGoal);write("")),
+	( isValid(StartX,StartYPlusOne,LastX,LastY) -> findPath(StartX,StartYPlusOne, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
 
-	( isValid(StartXPlusOne,StartY,LastX,LastY) -> findPath(StartXPlusOne,StartY, EndX,EndY,append(Path,[StartX,StartY]),StartX,StartY,ButtonNum,FindingGoal);write("")),
-	( isValid(StartXMinusOne,StartY,LastX,LastY) -> findPath(StartXMinusOne,StartY, EndX,EndY,append(Path,[StartX,StartY]),StartX,StartY,ButtonNum,FindingGoal);write("")),
-	( isValid(StartX,StartYMinusOne,LastX,LastY) -> findPath(StartX,StartYMinusOne, EndX,EndY,append(Path,[StartX,StartY]),StartX,StartY,ButtonNum,FindingGoal);write("")),
-
-
-
+	( isValid(StartXPlusOne,StartY,LastX,LastY) -> findPath(StartXPlusOne,StartY, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
+	( isValid(StartXMinusOne,StartY,LastX,LastY) -> findPath(StartXMinusOne,StartY, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
+	( isValid(StartX,StartYMinusOne,LastX,LastY) -> findPath(StartX,StartYMinusOne, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
 
 	write("").
 
-print([]):-
-	write("").
-print(H|T):-
-	write(H),
-	print(T).
+print([],_).
+print(Path,Stream):-
 
+	Path = [ H | T],
+	H = [ X | Y ],
+	Y = [G],
+	write(Stream,"["),write(Stream,X),write(Stream,","),write(Stream,G),write(Stream,"]"),write(Stream,"\n"),
 
-printPath(X,Y,ButtonNum,Path) :-
-	write("printing path"),nl,
-	print(Path),
+	print(T,Stream).
 
+printPath(X,Y,ButtonNum,Path,Stream) :-
+	%write(Path),nl,
+	print(Path,Stream),
+	write("Found Button "),write(ButtonNum),nl,
 	inc(ButtonNum,NewButtonNum),
-	simulateC(X,Y,NewButtonNum).
+	simulateC(X,Y,NewButtonNum,Stream).
 
-printLastPath(X,Y,ButtonNum,Path) :-
-	write("done"),nl,
-
-	write("ButtonNum is "),write(ButtonNum),
-
+printLastPath(X,Y,Path,Stream) :-
+	write("done with simulation"),nl,
+	print(Path,Stream),
+	write(Stream,"["),write(Stream,X),write(Stream,","),write(Stream,Y),write(Stream,"]"),
+	write("Found Goal"),nl,
+	write("Terminating Program"),
+	% Terminate Program
+	close(Stream),
 	fail.
-
-
 
 
 % Will there be boards without buttons?

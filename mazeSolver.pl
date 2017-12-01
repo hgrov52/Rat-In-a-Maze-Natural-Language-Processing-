@@ -36,15 +36,12 @@ dec(X,X1) :-
 main :-
 
 	% get info from the info module
-	mazeInfo:info(W,H,Type),
+	mazeInfo:info(_,_,Type),
 	mazeInfo:start(X,Y),
-	mazeInfo:num_buttons(N),
 
 	%Stream is the output file to write to  
     open('path-solution.txt',write, Stream),
 
-	write("The board is "),write(W),write(" by "),write(H),write(" and is type "),write(Type),write(" and has "),write(N),write( " buttons"), nl,
-	write("The start point is: "),write(X),write(","),write(Y),nl,nl,
 	
 	% if statement syntax
 	( isA(Type) -> simulateA(X,Y,Stream) ; simulateC(X,Y,1,Stream) ),
@@ -52,9 +49,40 @@ main :-
 
 	write("end").
 
-simulateA(StartX, StartY,_) :- 
-	write("Sim A"),nl,
-	write("Starts at "),write(StartX),write(","),write(StartY),nl.
+simulateA(StartX, StartY,Stream) :- 
+	mazeInfo:goal(GoalX,GoalY),
+	write(Stream,"["),write(Stream,StartX),write(Stream,","),write(Stream,StartY),write(Stream,"]"),write(Stream,"\n"),
+
+	(StartX =:= GoalX,StartY =:= GoalY -> halt();write("")),
+
+	( StartX < GoalX -> 
+		inc(StartX,NewStartX),
+		simulateA(NewStartX,StartY,Stream)
+		;
+
+		(StartX > GoalX ->
+			dec(StartX,NewStartX),
+			simulateA(NewStartX,StartY,Stream)
+			;
+
+			(StartY < GoalY ->
+				inc(StartY,NewStartY),
+				simulateA(StartX,NewStartY,Stream)
+				;
+
+				(StartY > GoalY ->
+					dec(StartY,NewStartY),
+					simulateA(StartX,NewStartY,Stream)
+					;
+
+					write("Shouldnt be here"),nl
+					)
+
+				)
+
+			)
+
+		).
 
 simulateC(StartX, StartY, ButtonNum,Stream) :- 
 	%nl,write("Sim C"),nl,
@@ -74,7 +102,7 @@ simulateC(StartX, StartY, ButtonNum,Stream) :-
 	findPath(StartX, StartY, ButtonX, ButtonY,[], -1,-1,ButtonNum,false,Stream).
 
 findPath(StartX,StartY,EndX,EndY,Path,LastX,LastY,ButtonNum,FindingGoal,Stream) :-
-	%write("In find path at "),write(StartX),write(","),write(StartY), nl,
+	write("In find path at "),write(StartX),write(","),write(StartY), nl,
 	
 	(equal(StartX,EndX),equal(StartY,EndY),FindingGoal -> printLastPath(StartX,StartY,Path,Stream) ; write("")),
 	
@@ -88,13 +116,17 @@ findPath(StartX,StartY,EndX,EndY,Path,LastX,LastY,ButtonNum,FindingGoal,Stream) 
 
 	append(Path,[[StartX,StartY]],NewPath),
 	
-	( isValid(StartX,StartYPlusOne,LastX,LastY) -> findPath(StartX,StartYPlusOne, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
+	%down
+	%right
+	%left
+	%up
 
+	( isValid(StartX,StartYPlusOne,LastX,LastY) -> findPath(StartX,StartYPlusOne, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
 	( isValid(StartXPlusOne,StartY,LastX,LastY) -> findPath(StartXPlusOne,StartY, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
 	( isValid(StartXMinusOne,StartY,LastX,LastY) -> findPath(StartXMinusOne,StartY, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
 	( isValid(StartX,StartYMinusOne,LastX,LastY) -> findPath(StartX,StartYMinusOne, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
 
-	write("").
+	write("Shouldnt be here").
 
 print([],_).
 print(Path,Stream):-

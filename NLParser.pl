@@ -1,11 +1,11 @@
-:- module('NLParser',[]).
+:- module('NLParser',[main/0]).
 
 main :-
 	%open the file to parse
     open('NL-input.txt', read, Str),
 
     %Stream is the output file to write to  
-    open('path-solution.txt',write, Stream),
+    open('NL-parse-solution.txt',write, Stream),
 
     %parse the file
     read_file(Str,Lines),
@@ -18,9 +18,17 @@ main :-
 
     %write the output to the output file
     write(Stream,Words), nl,
+    parse(Words),
 
     %close the output stream so that the text will show up
     close(Stream).
+
+parseParagraph([]).
+parseParagraph(Para):-
+    Para = [Sentence|Tail],
+    write(H),nl.
+    parseParagraph(Tail).
+
 
 
 

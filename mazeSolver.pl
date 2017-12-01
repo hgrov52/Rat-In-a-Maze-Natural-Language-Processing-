@@ -118,10 +118,10 @@ printLastPath(X,Y,Path,Stream) :-
 	print(Path,Stream),
 	write(Stream,"["),write(Stream,X),write(Stream,","),write(Stream,Y),write(Stream,"]"),
 	write("Found Goal"),nl,
-	write("Terminating Program"),
+	write("Terminating Program"),nl,
 	% Terminate Program
 	close(Stream),
-	fail.
+	halt().
 
 
 % Will there be boards without buttons?

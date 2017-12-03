@@ -18,16 +18,49 @@ main :-
 
     %write the output to the output file
     write(Stream,Words), nl,
-    parse(Words),
+    close(Stream),
+    
+    parseParagraph(Words),
 
-    %close the output stream so that the text will show up
-    close(Stream).
+    write("").
+
+    
+
+
+% Words that are not in the examples should make the 
+% sentence invalid becuase they are not in the vocabulary.
+
+
+list_empty([], true).
+list_empty([_|_], false).
 
 parseParagraph([]).
 parseParagraph(Para):-
     Para = [Sentence|Tail],
-    write(H),nl.
+    parseSentence(Sentence,[],[]),nl,
     parseParagraph(Tail).
+
+parseSentence([]).
+parseSentence(H|T,SubjectPhrase,VerbPhrase):-
+    ListSubjectPhrases = ["the","a","rat","it","he","rodent","einstein"],
+    Verbs = ["ran","moved","pushed","scurried","pushed","the","button","1","2","3","4","5","6","7","8","9","cells","cell","squares","up","down","left","right"],
+
+    (member(H,ListSubjectPhrases) -> 
+        append([H],SubjectPhrase,NewSubjectPhrase),
+        parseSentence(T,NewSubjectPhrase,VerbPhrase);write("")),
+    (member(H,ListVerbPhrases) ->
+        append([H],VerbPhrase,NewVerbPhrase),
+        parseSentence(T,NewSubjectPhrase,VerbPhrase);write("")),
+
+    parseSubjectPhrase(SubjectPhrase),
+    parseVerbPhrase(VerbPhrase).
+
+parseSubjectPhrase(SubjectPhrase):-
+    write(SubjectPhrase).
+
+parseVerbPhrase(VerbPhrase):-
+    write(VerbPhrase).
+    
 
 
 

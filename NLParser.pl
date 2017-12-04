@@ -13,14 +13,13 @@ main :-
     %Convert the lines in file to an list of sentences that are lists of words
     lines_to_words(Lines, Words),
 
-    
 
-    %write the output to the output file
-    write(Stream,Words), nl,
-    close(Stream),
+    
     parseParagraph(Words),
     %catch(tester(Words),error(E,C),(writeln(E:C),false)),
 
+
+    close(Stream),
     %close the parsing file
     close(Str),
 
@@ -53,6 +52,7 @@ listVerbSingleObjects(["button"]).
 parseParagraph([]).
 parseParagraph(Para):-
     Para = [Sentence|Tail],
+    write(Sentence),nl,
     parseSentence(Sentence),nl,
     parseParagraph(Tail).
 
@@ -62,10 +62,14 @@ not(X):-
     (X->false;true).
 
 parseSentence([]).
-parseSentence([One|Temp1]):-
-    Temp1 = [Two|Temp2],
-    Temp2 = [Three|Temp3],
-    Temp3 = [Four|Temp4],
+parseSentence(X):-
+    X     = [One|Temp1],
+    list_empty(Temp1,TwoWords),
+    (TwoWords->write("");Temp1 = [Two|Temp2]),
+    list_empty(Temp1,ThreeWords),
+    (ThreeWords->write("");Temp2 = [Three|Temp3]),
+    list_empty(Temp1,FourWords),
+    (FourWords->write("");Temp3 = [Four|Temp4]),
     list_empty(Temp4,FiveWords),
     (FiveWords->write("");Temp4 = [Five|Temp5]),
     list_empty(Temp5,SixWords),
@@ -86,107 +90,109 @@ parseSentence([One|Temp1]):-
     listVerbSingleObjects(VO),
     listDirections(D),
 
-    % One is a subject
-    (member(One,LSS)->
-        % Two must be a verb
-        (member(Two,VV)->
-            %========== After Verb
+    (not(FourWords)->
+        % One is a subject
+        (member(One,LSS)->
+            % Two must be a verb
+            (member(Two,VV)->
+                %========== After Verb
 
-            % Three is a number or an article 
-            (member(Three,N)->
-                % Three was a number
-                % Four must be in listVerbDirectionalObjects
-                (member(Four,VDO)->
-                    % Five must be a Direction
-                    (member(Five,D)->
-                        (not(SixWords)->write("8")
-                            ;
-                            write("Valid Sentence")
-                        );
-                        % Five is not a directoion, invalid sentence
-                        write("9")
-                    );
-                    % Four is not a Directional Object so invalid sentence
-                    write("7")
-                );
-                % Three was not a number so it must be in listVerbArticles
-                (member(Three,VA)->
-                    %Four must be in listVerbSingleObjects
-                    (member(Four,VO)->
-                        % valid as long as no word follows
-                        (FiveWords->write("2")
-                            ;
-                            write("Valid Sentence")
-                        )
-                    );
-                    % Not a valid sentence
-                    write("1")
-                )
-            )
-
-            %==========
-            ;
-            % Two is not a verb so not a valid sentence
-            %makeFalse(Valid4)
-            write("3")
-        );
-        % One is not a subject, so must be an listSubjectPhraseArticles
-        (member(One,LSA)->
-            % Two must be in listSubjectPhraseSubjects
-            (member(Two,LSS)->
-                % Three must be a verb
-                (member(Three,VV)->
-                    %======== After Verb
-
-
-                    % Four is a number or an article 
-                    (member(Four,N)->
-                        % Four was a number
-                        % Five must be in listVerbDirectionalObjects
-                        (member(Five,VDO)->
-                            % Six must be a Direction
-                            (member(Six,D)->
-                                (SixWords->write("10")
-                                    ;
-                                    write("Valid Sentence")
-                                );
-                                % Six is not a directoion, invalid sentence
-                                write("11")
+                % Three is a number or an article 
+                (member(Three,N)->
+                    % Three was a number
+                    % Four must be in listVerbDirectionalObjects
+                    (member(Four,VDO)->
+                        % Five must be a Direction
+                        (member(Five,D)->
+                            (not(SixWords)->write("8")
+                                ;
+                                write("Valid Sentence")
                             );
-                            % Five is not a Directional Object so invalid sentence
-                            write("12")
+                            % Five is not a directoion, invalid sentence
+                            write("No Direction")
                         );
-                        % Four was not a number so it must be in listVerbArticles
-                        (member(Four,VA)->
-                            %Five must be in listVerbSingleObjects
-                            (member(Five,VO)->
-                                % valid as long as no word follows
-                                (not(Empty)->write("13")
-                                    ;
-                                    write("Valid Sentence")
-                                )
-                            );
-                            % Not a valid sentence
-                            write("14")
-                        )
+                        % Four is not a Directional Object so invalid sentence
+                        write("No Directional Object")
+                    );
+                    % Three was not a number so it must be in listVerbArticles
+                    (member(Three,VA)->
+                        %Four must be in listVerbSingleObjects
+                        (member(Four,VO)->
+                            % valid as long as no word follows
+                            (FiveWords->write("2")
+                                ;
+                                write("Valid Sentence")
+                            )
+                        );
+                        % Not a valid sentence
+                        write("No Verb Article")
                     )
+                )
 
-                    %========
-                    ;
-                    % Three is not a verb so not a valid sentence
-                    %makeFalse(Valid5)
-                    write("4")
-                );
-                % Two isnt a subject so not a valid sentence
-                %makeFalse(Valid3)
-                write("5")
+                %==========
+                ;
+                % Two is not a verb so not a valid sentence
+                %makeFalse(Valid4)
+                write("No Verb")
             );
-            % One isnt a subject or article so not a valid sentence
-            %makeFalse(Valid2)
-            write("6")
-        )
-    ),
-    write("").
+            % One is not a subject, so must be an listSubjectPhraseArticles
+            (member(One,LSA)->
+                % Two must be in listSubjectPhraseSubjects
+                (member(Two,LSS)->
+                    % Three must be a verb
+                    (member(Three,VV)->
+                        %======== After Verb
+
+
+                        % Four is a number or an article 
+                        (member(Four,N)->
+                            % Four was a number
+                            % Five must be in listVerbDirectionalObjects
+                            (member(Five,VDO)->
+                                % Six must be a Direction
+                                (member(Six,D)->
+                                    (SixWords->write("10")
+                                        ;
+                                        write("Valid Sentence")
+                                    );
+                                    % Six is not a directoion, invalid sentence
+                                    write("No Direction")
+                                );
+                                % Five is not a Directional Object so invalid sentence
+                                write("No Directional Object")
+                            );
+                            % Four was not a number so it must be in listVerbArticles
+                            (member(Four,VA)->
+                                %Five must be in listVerbSingleObjects
+                                (member(Five,VO)->
+                                    % valid as long as no word follows
+                                    (not(Empty)->write("13")
+                                        ;
+                                        write("Valid Sentence")
+                                    )
+                                );
+                                % Not a valid sentence
+                                write("No Verb Article")
+                            )
+                        )
+
+                        %========
+                        ;
+                        % Three is not a verb so not a valid sentence
+                        %makeFalse(Valid5)
+                        write("No Verb")
+                    );
+                    % Two isnt a subject so not a valid sentence
+                    %makeFalse(Valid3)
+                    write("No Subject")
+                );
+                % One isnt a subject or article so not a valid sentence
+                %makeFalse(Valid2)
+                write("No Subject or Article")
+            )
+        );
+    write("Too Few Words to be a Move")),
+    write(""),nl.
     
 
 

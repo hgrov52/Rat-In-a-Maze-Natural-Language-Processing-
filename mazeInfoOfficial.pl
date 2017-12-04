@@ -13,7 +13,6 @@ wall(3,1).
 wall(4,3).
 wall(4,4).
 
-
 button(0,0,2).
 button(0,3,1).
 

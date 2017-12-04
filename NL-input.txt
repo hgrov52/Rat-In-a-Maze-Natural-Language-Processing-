@@ -10,6 +10,5 @@
 "the rodent scurried 3 squares up".
 "a up scurried 3 squares up".
 "a rodent he 3 squares up".
-"a rodent scurried 0 squares up".
 "a rodent scurried 3 up down".
 "a rodent scurried 3 squares up".

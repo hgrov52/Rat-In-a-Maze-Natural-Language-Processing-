@@ -195,8 +195,6 @@ parseSentence(X):-
     write(""),nl.
     
 
-
-
 % Credit to StackOverflow and author Ishq for file parser
 % https://stackoverflow.com/a/4805931
 % https://stackoverflow.com/users/577045/ishq

@@ -2,7 +2,6 @@
 
 info(5, 5, c).
 
-
 wall(0,0).
 wall(1,0).
 wall(2,0).

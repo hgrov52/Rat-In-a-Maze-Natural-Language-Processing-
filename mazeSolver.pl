@@ -46,7 +46,6 @@ main :-
 	% if statement syntax
 	( isA(Type) -> simulateA(X,Y,Stream) ; simulateC(X,Y,1,Stream) ),
 	
-
 	write("end").
 
 simulateA(StartX, StartY,Stream) :- 
@@ -81,7 +80,6 @@ simulateA(StartX, StartY,Stream) :-
 				)
 
 			)
-
 		).
 
 simulateC(StartX, StartY, ButtonNum,Stream) :- 

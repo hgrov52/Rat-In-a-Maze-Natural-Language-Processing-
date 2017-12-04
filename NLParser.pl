@@ -13,14 +13,15 @@ main :-
     %Convert the lines in file to an list of sentences that are lists of words
     lines_to_words(Lines, Words),
 
-    %close the parsing file
-    close(Str),
+    
 
     %write the output to the output file
     write(Stream,Words), nl,
     close(Stream),
-    
     parseParagraph(Words),
+
+    %close the parsing file
+    close(Str),
 
     write("").
 
@@ -34,23 +35,36 @@ main :-
 list_empty([], true).
 list_empty([_|_], false).
 
+
+listSubjectPhrases(["the","a","rat","it","he","rodent","einstein"]).
+listVerbPhrases(["ran","moved","pushed","scurried","pushed","the","button","1","2","3","4","5","6","7","8","9","cells","cell","squares","up","down","left","right"]).
+
+
 parseParagraph([]).
 parseParagraph(Para):-
     Para = [Sentence|Tail],
     parseSentence(Sentence,[],[]),nl,
     parseParagraph(Tail).
 
-parseSentence([]).
-parseSentence(H|T,SubjectPhrase,VerbPhrase):-
-    ListSubjectPhrases = ["the","a","rat","it","he","rodent","einstein"],
-    Verbs = ["ran","moved","pushed","scurried","pushed","the","button","1","2","3","4","5","6","7","8","9","cells","cell","squares","up","down","left","right"],
+parseSentence([],_,_).
+parseSentence(Sent,SubjectPhrase,VerbPhrase):-
 
-    (member(H,ListSubjectPhrases) -> 
+    Sent = [H|T],
+
+    listSubjectPhrases(LSP),
+    listVerbPhrases(V),
+
+    
+    write(H),nl,
+    (member(H,LSP) -> 
         append([H],SubjectPhrase,NewSubjectPhrase),
-        parseSentence(T,NewSubjectPhrase,VerbPhrase);write("")),
-    (member(H,ListVerbPhrases) ->
-        append([H],VerbPhrase,NewVerbPhrase),
-        parseSentence(T,NewSubjectPhrase,VerbPhrase);write("")),
+        parseSentence(T,NewSubjectPhrase,VerbPhrase)
+        ;
+        (member(H,V) ->
+            append([H],VerbPhrase,NewVerbPhrase),
+            parseSentence(T,SubjectPhrase,NewVerbPhrase)
+            ;
+            write(""))),
 
     parseSubjectPhrase(SubjectPhrase),
     parseVerbPhrase(VerbPhrase).

@@ -19,6 +19,7 @@ main :-
     write(Stream,Words), nl,
     close(Stream),
     parseParagraph(Words),
+    %catch(tester(Words),error(E,C),(writeln(E:C),false)),
 
     %close the parsing file
     close(Str),
@@ -26,56 +27,167 @@ main :-
     write("").
 
     
+tester([]).
+tester([H|T]):-
+    fail,
 
-
+    write("").
 % Words that are not in the examples should make the 
 % sentence invalid becuase they are not in the vocabulary.
-
+writeThis(X):-
+    write(X).
 
 list_empty([], true).
 list_empty([_|_], false).
 
 
-listSubjectPhrases(["the","a","rat","it","he","rodent","einstein"]).
-listVerbPhrases(["ran","moved","pushed","scurried","pushed","the","button","1","2","3","4","5","6","7","8","9","cells","cell","squares","up","down","left","right"]).
-
+listSubjectPhraseArticles(["the","a"]).
+listSubjectPhraseSubjects(["rat","it","he","rodent","einstein"]).
+listVerbPhraseVerbs(["ran","moved","pushed","scurried"]).
+listNumbers(["1","2","3","4","5","6","7","8","9"]).
+listDirections(["up","down","left","right"]).
+listVerbArticles(["the"]).
+listVerbDirectionalObjects(["cells","cell","squares","square"]).
+listVerbSingleObjects(["button"]).
 
 parseParagraph([]).
 parseParagraph(Para):-
     Para = [Sentence|Tail],
-    parseSentence(Sentence,[],[]),nl,
+    parseSentence(Sentence),nl,
     parseParagraph(Tail).
 
-parseSentence([],_,_).
-parseSentence(Sent,SubjectPhrase,VerbPhrase):-
+makeTrue(true).
+makeFalse(false).
+not(X):-
+    (X->false;true).
 
-    Sent = [H|T],
+parseSentence([]).
+parseSentence([One|Temp1]):-
+    Temp1 = [Two|Temp2],
+    Temp2 = [Three|Temp3],
+    Temp3 = [Four|Temp4],
+    list_empty(Temp4,FiveWords),
+    (FiveWords->write("");Temp4 = [Five|Temp5]),
+    list_empty(Temp5,SixWords),
+    (SixWords->write("");Temp5 = [Six|Rest]),
 
-    listSubjectPhrases(LSP),
-    listVerbPhrases(V),
+    % Not a Valid sentence if Empty is not true
+    list_empty(Rest,Empty),
 
-    
-    write(H),nl,
-    (member(H,LSP) -> 
-        append([H],SubjectPhrase,NewSubjectPhrase),
-        parseSentence(T,NewSubjectPhrase,VerbPhrase)
-        ;
-        (member(H,V) ->
-            append([H],VerbPhrase,NewVerbPhrase),
-            parseSentence(T,SubjectPhrase,NewVerbPhrase)
+    % One can be in listSubjectPhraseSubjects or 
+    % One can be in listSubjectPhraseArticles but 
+    % Two then has to be in listSubjectPhraseSubjects
+    listSubjectPhraseSubjects(LSS),
+    listVerbPhraseVerbs(VV),
+    listSubjectPhraseArticles(LSA),
+    listNumbers(N),
+    listVerbDirectionalObjects(VDO),
+    listVerbArticles(VA),
+    listVerbSingleObjects(VO),
+    listDirections(D),
+
+    % One is a subject
+    (member(One,LSS)->
+        % Two must be a verb
+        (member(Two,VV)->
+            %========== After Verb
+
+            % Three is a number or an article 
+            (member(Three,N)->
+                % Three was a number
+                % Four must be in listVerbDirectionalObjects
+                (member(Four,VDO)->
+                    % Five must be a Direction
+                    (member(Five,D)->
+                        (not(SixWords)->write("8")
+                            ;
+                            write("Valid Sentence")
+                        );
+                        % Five is not a directoion, invalid sentence
+                        write("9")
+                    );
+                    % Four is not a Directional Object so invalid sentence
+                    write("7")
+                );
+                % Three was not a number so it must be in listVerbArticles
+                (member(Three,VA)->
+                    %Four must be in listVerbSingleObjects
+                    (member(Four,VO)->
+                        % valid as long as no word follows
+                        (FiveWords->write("2")
+                            ;
+                            write("Valid Sentence")
+                        )
+                    );
+                    % Not a valid sentence
+                    write("1")
+                )
+            )
+
+            %==========
             ;
-            write(""))),
+            % Two is not a verb so not a valid sentence
+            %makeFalse(Valid4)
+            write("3")
+        );
+        % One is not a subject, so must be an listSubjectPhraseArticles
+        (member(One,LSA)->
+            % Two must be in listSubjectPhraseSubjects
+            (member(Two,LSS)->
+                % Three must be a verb
+                (member(Three,VV)->
+                    %======== After Verb
 
-    parseSubjectPhrase(SubjectPhrase),
-    parseVerbPhrase(VerbPhrase).
 
-parseSubjectPhrase(SubjectPhrase):-
-    write(SubjectPhrase).
+                    % Four is a number or an article 
+                    (member(Four,N)->
+                        % Four was a number
+                        % Five must be in listVerbDirectionalObjects
+                        (member(Five,VDO)->
+                            % Six must be a Direction
+                            (member(Six,D)->
+                                (SixWords->write("10")
+                                    ;
+                                    write("Valid Sentence")
+                                );
+                                % Six is not a directoion, invalid sentence
+                                write("11")
+                            );
+                            % Five is not a Directional Object so invalid sentence
+                            write("12")
+                        );
+                        % Four was not a number so it must be in listVerbArticles
+                        (member(Four,VA)->
+                            %Five must be in listVerbSingleObjects
+                            (member(Five,VO)->
+                                % valid as long as no word follows
+                                (not(Empty)->write("13")
+                                    ;
+                                    write("Valid Sentence")
+                                )
+                            );
+                            % Not a valid sentence
+                            write("14")
+                        )
+                    )
 
-parseVerbPhrase(VerbPhrase):-
-    write(VerbPhrase).
+                    %========
+                    ;
+                    % Three is not a verb so not a valid sentence
+                    %makeFalse(Valid5)
+                    write("4")
+                );
+                % Two isnt a subject so not a valid sentence
+                %makeFalse(Valid3)
+                write("5")
+            );
+            % One isnt a subject or article so not a valid sentence
+            %makeFalse(Valid2)
+            write("6")
+        )
+    ),
+    write("").
     
-
 
 
 

@@ -78,7 +78,6 @@ simulateA(StartX, StartY,Stream) :-
 					)
 
 				)
-
 			)
 		).
 

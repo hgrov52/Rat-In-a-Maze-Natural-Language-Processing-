@@ -192,6 +192,9 @@ printLastPath(X,Y,Path,Stream) :-
 
 getStartCors(X,Y):-
 	mazeInfo:start(X,Y).
+
+getButtonCors(X,Y):-
+	(mazeInfo:button(X,Y,_)->true;false).
 /*
 % used for a button push command
 nLMoverb(StartX,StartY,Stream):-

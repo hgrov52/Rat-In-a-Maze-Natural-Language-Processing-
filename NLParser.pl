@@ -54,6 +54,8 @@ listVerbSingleObjects(["button"]).
 parseParagraph([],_,_,_).
 parseParagraph(Para,StartX,StartY,Stream):-
     Para = [Sentence|Tail],
+
+
     parseSentence(Sentence,StartX,StartY,NewX,NewY,Stream),nl,
 
     
@@ -216,15 +218,16 @@ parseSentence(X,StartX,StartY,NewX,NewY,Stream):-
 % can he push a button if theres no button where hes standing?
 
 
-interpretValidSentence([],_,_,_).
+interpretValidSentence([],_,_,_,_,_).
 interpretValidSentence(Sent,StartX,StartY,NewX,NewY,Stream):-
-    
-    (member("button",Sent)-> pushButton(StartX,StartY,Stream),
-        NewX is StartX,NewY is StartY
+    format("~w ~n ~w,~w~n",[Sent,StartX,StartY]),
+    (not(var(StartX)),not(var(StartY))->write("");write(Stream,"Not a valid move"),close(Stream),halt()),
+
+    (member("button",Sent)-> pushButton(StartX,StartY,NewX,NewY,Stream)
         ;
         % moving rat to diff location
         findNumber(Sent,Num),
-        findNewCoordinates(Sent,StartX,StartY,NewX,NewY,Num),
+        findNewCoordinates(Sent,StartX,StartY,EndX,EndY,Num),
         format("Move from ~w,~w to ~w,~w~n",[StartX,StartY,EndX,EndY]),
         (mazeSolver:isValidNL(StartX,StartY,EndX,EndY)->
             format(Stream,"Valid move~n",[]),
@@ -232,14 +235,21 @@ interpretValidSentence(Sent,StartX,StartY,NewX,NewY,Stream):-
             NewX is EndX,NewY is EndY
             ;
             format(Stream,"Not a valid move~n",[]),
-            write("Not a valid move"),
-            NewX is StartX,NewY is StartY
+            write("Not a valid move"),close(Stream),halt()
         )    
     ).
 
-    
-pushButton(X,Y,Stream):-
-    format("Push button at ~w,~w",[X,Y]).
+
+pushButton(X,Y,NewX,NewY,Stream):-
+    (mazeSolver:getButtonCors(X,Y)->format(Stream,"Valid move~n",[]),
+        format("Valid move pushed button~n",[]),
+        NewX is X,NewY is Y
+        ;
+        format(Stream,"Not a valid move",[]),
+        format("Not a valid move~nClosing Program",[]),
+        close(Stream),
+        halt()
+    ).
 
 
 findNumber([H|T],Num):-

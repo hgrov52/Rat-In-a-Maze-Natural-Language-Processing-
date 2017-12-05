@@ -3,9 +3,12 @@
 "einstein moved 1 cell down".
 "the rat pushed the button".
 "a rodent scurried 3 squares up".
+"he pushed the button".
+"he moved 3 cells down".
+"he pushed the button".
+"he moved 1 cell right".
 "down einstein scurried squares 3".
-"he moved 1 cell left".
-"einstein pushed the button".
-"two words".
 "".
-"he ran 3 squares up down".
+"celm move he the up".
+"a rodent ran 3 cells left right".
+"he moved up down 1 the".

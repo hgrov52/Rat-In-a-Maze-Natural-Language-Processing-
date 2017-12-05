@@ -12,18 +12,18 @@ notEqualToLastLoc(X,Y,LastX,LastY) :-
 	(equal(X,LastX),equal(Y,LastY) -> false; true).
 
 
-isValid(X,Y,LastX,LastY) :-
+isValid(X,Y,LastX,LastY,Path,ButtonNum) :-
 	mazeInfo:info(W,H,_),
 
 	(X < 0 -> false;write("")),
 	(Y < 0 -> false;write("")),
 	(X > W-1 -> false;write("")),
 	(Y > H-1 -> false;write("")),
-
 	notEqualToLastLoc(X,Y,LastX,LastY),
-
-	(mazeInfo:wall(X,Y)->false;true),
-
+	(member([X,Y],Path)->false;write("")),
+	(mazeInfo:wall(X,Y)->false;write("")),
+	(mazeInfo:button(X,Y,BNum)->(BNum=:=ButtonNum->write("");false);write("")),
+	
 	true.
 
 
@@ -102,28 +102,27 @@ findPath(StartX,StartY,EndX,EndY,Path,LastX,LastY,ButtonNum,FindingGoal,Stream) 
 	write("In find path at "),write(StartX),write(","),write(StartY), nl,
 	
 	(equal(StartX,EndX),equal(StartY,EndY),FindingGoal -> printLastPath(StartX,StartY,Path,Stream) ; write("")),
-	
-
 	(equal(StartX,EndX),equal(StartY,EndY) -> printPath(StartX,StartY,ButtonNum,Path,Stream) ; write("")),
-
+	write(FindingGoal),nl,
 	inc(StartX,StartXPlusOne),
 	inc(StartY,StartYPlusOne),
 	dec(StartX,StartXMinusOne),
 	dec(StartY,StartYMinusOne),
 
+
 	append(Path,[[StartX,StartY]],NewPath),
 	
 	%down
 	%right
-	%left
 	%up
+	%left
 
-	( isValid(StartX,StartYPlusOne,LastX,LastY) -> findPath(StartX,StartYPlusOne, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
-	( isValid(StartXPlusOne,StartY,LastX,LastY) -> findPath(StartXPlusOne,StartY, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
-	( isValid(StartXMinusOne,StartY,LastX,LastY) -> findPath(StartXMinusOne,StartY, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
-	( isValid(StartX,StartYMinusOne,LastX,LastY) -> findPath(StartX,StartYMinusOne, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
-
-	write("Shouldnt be here").
+	( isValid(StartX,StartYPlusOne,LastX,LastY,Path,ButtonNum) -> findPath(StartX,StartYPlusOne, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
+	( isValid(StartXPlusOne,StartY,LastX,LastY,Path,ButtonNum) -> findPath(StartXPlusOne,StartY, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
+	( isValid(StartX,StartYMinusOne,LastX,LastY,Path,ButtonNum) -> findPath(StartX,StartYMinusOne, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
+	( isValid(StartXMinusOne,StartY,LastX,LastY,Path,ButtonNum) -> findPath(StartXMinusOne,StartY, EndX,EndY,NewPath,StartX,StartY,ButtonNum,FindingGoal,Stream);write("")),
+	
+	write("Backtrack"),nl.
 
 print([],_).
 print(Path,Stream):-
@@ -151,6 +150,8 @@ printLastPath(X,Y,Path,Stream) :-
 	% Terminate Program
 	close(Stream),
 	halt().
+
+%NLMover(Type)
 
 
 % Will there be boards without buttons?

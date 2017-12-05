@@ -63,39 +63,37 @@ not(X):-
 
 parseSentence([]).
 parseSentence(X):-
-    X     = [One|Temp1],
-    list_empty(Temp1,TwoWords),
-    (TwoWords->write("");Temp1 = [Two|Temp2]),
-    list_empty(Temp1,ThreeWords),
-    (ThreeWords->write("");Temp2 = [Three|Temp3]),
-    list_empty(Temp1,FourWords),
-    (FourWords->write("");Temp3 = [Four|Temp4]),
-    list_empty(Temp4,FiveWords),
-    (FiveWords->write("");Temp4 = [Five|Temp5]),
-    list_empty(Temp5,SixWords),
-    (SixWords->write("");Temp5 = [Six|Rest]),
+    length(X,ListLength),
+    (ListLength>3,ListLength<7 ->
+        X     = [One|Temp1],
+        Temp1 = [Two|Temp2],
+        Temp2 = [Three|Temp3],
+        Temp3 = [Four|Temp4],
+        list_empty(Temp4,FiveWords),
+        (FiveWords->write("");Temp4 = [Five|Temp5]),
+        list_empty(Temp5,SixWords),
+        (SixWords->write("");Temp5 = [Six|Rest]),
 
-    % Not a Valid sentence if Empty is not true
-    list_empty(Rest,Empty),
+        % Not a Valid sentence if Empty is not true
+        list_empty(Rest,Empty),
 
-    % One can be in listSubjectPhraseSubjects or 
-    % One can be in listSubjectPhraseArticles but 
-    % Two then has to be in listSubjectPhraseSubjects
-    listSubjectPhraseSubjects(LSS),
-    listVerbPhraseVerbs(VV),
-    listSubjectPhraseArticles(LSA),
-    listNumbers(N),
-    listVerbDirectionalObjects(VDO),
-    listVerbArticles(VA),
-    listVerbSingleObjects(VO),
-    listDirections(D),
+        % One can be in listSubjectPhraseSubjects or 
+        % One can be in listSubjectPhraseArticles but 
+        % Two then has to be in listSubjectPhraseSubjects
+        listSubjectPhraseSubjects(LSS),
+        listVerbPhraseVerbs(VV),
+        listSubjectPhraseArticles(LSA),
+        listNumbers(N),
+        listVerbDirectionalObjects(VDO),
+        listVerbArticles(VA),
+        listVerbSingleObjects(VO),
+        listDirections(D),
 
-    (not(FourWords)->
         % One is a subject
         (member(One,LSS)->
             % Two must be a verb
             (member(Two,VV)->
-                %========== After Verb
+                % ========== After Verb
 
                 % Three is a number or an article 
                 (member(Three,N)->
@@ -104,9 +102,10 @@ parseSentence(X):-
                     (member(Four,VDO)->
                         % Five must be a Direction
                         (member(Five,D)->
-                            (not(SixWords)->write("8")
+                            (not(SixWords)->write("Too many words")
                                 ;
-                                write("Valid Sentence")
+                                write("Valid Sentence"),
+                                interpretValidSentence(X)
                             );
                             % Five is not a directoion, invalid sentence
                             write("No Direction")
@@ -119,9 +118,10 @@ parseSentence(X):-
                         %Four must be in listVerbSingleObjects
                         (member(Four,VO)->
                             % valid as long as no word follows
-                            (FiveWords->write("2")
+                            (not(FiveWords)->write("Too many words")
                                 ;
-                                write("Valid Sentence")
+                                write("Valid Sentence"),
+                                interpretValidSentence(X)
                             )
                         );
                         % Not a valid sentence
@@ -129,7 +129,7 @@ parseSentence(X):-
                     )
                 )
 
-                %==========
+                % ==========
                 ;
                 % Two is not a verb so not a valid sentence
                 %makeFalse(Valid4)
@@ -141,7 +141,7 @@ parseSentence(X):-
                 (member(Two,LSS)->
                     % Three must be a verb
                     (member(Three,VV)->
-                        %======== After Verb
+                        % ======== After Verb
 
 
                         % Four is a number or an article 
@@ -151,9 +151,10 @@ parseSentence(X):-
                             (member(Five,VDO)->
                                 % Six must be a Direction
                                 (member(Six,D)->
-                                    (SixWords->write("10")
+                                    (not(Empty)->write("10")
                                         ;
-                                        write("Valid Sentence")
+                                        write("Valid Sentence"),
+                                        interpretValidSentence(X)
                                     );
                                     % Six is not a directoion, invalid sentence
                                     write("No Direction")
@@ -168,7 +169,8 @@ parseSentence(X):-
                                     % valid as long as no word follows
                                     (not(Empty)->write("13")
                                         ;
-                                        write("Valid Sentence")
+                                        write("Valid Sentence"),
+                                        interpretValidSentence(X)
                                     )
                                 );
                                 % Not a valid sentence
@@ -176,7 +178,7 @@ parseSentence(X):-
                             )
                         )
 
-                        %========
+                        % ========
                         ;
                         % Three is not a verb so not a valid sentence
                         %makeFalse(Valid5)
@@ -190,9 +192,15 @@ parseSentence(X):-
                 %makeFalse(Valid2)
                 write("No Subject or Article")
             )
-        );
-    write("Too Few Words to be a Move")),
+        )
+    ;write("Not a Valid Sentence")),
     write(""),nl.
+
+% can he push a button if theres no button where hes standing?
+interpretValidSentence([]).
+interpretValidSentence(Sent):-
+    %(member("button")->)
+    write("").
     
 
 

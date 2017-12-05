@@ -5,9 +5,7 @@
 "a rodent scurried 3 squares up".
 "down einstein scurried squares 3".
 "he moved 1 cell left".
-"he einstein rat cell left".
-"a rodent scurried 3 squares up".
-"the rodent scurried 3 squares up".
-"a up scurried 3 squares up".
-"a rodent he 3 squares up".
-"a rodent scurried 3 up down".
+"einstein pushed the button".
+"two words".
+"".
+"he ran 3 squares up down".

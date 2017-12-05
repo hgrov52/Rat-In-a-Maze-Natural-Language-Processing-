@@ -43,6 +43,7 @@ list_empty([_|_], false).
 
 
 listSubjectPhraseArticles(["the","a"]).
+listSubjectPhraseSubjectsShort(["rat","rodent"]).
 listSubjectPhraseSubjects(["rat","it","he","rodent","einstein"]).
 listVerbPhraseVerbs(["ran","moved","pushed","scurried"]).
 listNumbers(["1","2","3","4","5","6","7","8","9"]).
@@ -96,6 +97,8 @@ parseSentence(X,StartX,StartY,NewX,NewY,Stream):-
         listVerbSingleObjects(VO),
         listDirections(D),
 
+        listSubjectPhraseSubjectsShort(LSSS),
+
         % One is a subject
         (member(One,LSS)->
             % Two must be a verb
@@ -148,8 +151,8 @@ parseSentence(X,StartX,StartY,NewX,NewY,Stream):-
             );
             % One is not a subject, so must be an listSubjectPhraseArticles
             (member(One,LSA)->
-                % Two must be in listSubjectPhraseSubjects
-                (member(Two,LSS)->
+                % Two must be in listSubjectPhraseSubjectsShort
+                (member(Two,LSSS)->
                     % Three must be a verb
                     (member(Three,VV)->
                         % ======== After Verb

@@ -1,4 +1,6 @@
 :- module('NLParser',[main/0]).
+:- use_module(mazeSolver,[nLMover/2,nLMover/4]).
+
 
 main :-
 	%open the file to parse
@@ -210,11 +212,20 @@ parseSentence(X,Stream):-
 % can he push a button if theres no button where hes standing?
 interpretValidSentence([],_).
 interpretValidSentence(Sent,Stream):-
-    %(member("button")->)
-    
-    format(Stream,"Valid move~n",[]).
-    
+    mazeSolver:nLMover(Sent,Stream).
 
+    
+    
+interpretValidSentence(Sent,StartX,StartY,Stream):-
+    %format(Stream,"Valid move~n",[]).
+    (member("button",Sent)-> write("button"),nl
+        ;
+        findNumber(Sent,Num),
+        write(Num),nl
+    ).
+
+findNumber([H|T],Num):-
+    (number_string(Num,H)->write("");findNumber(T,Num)).
 
 
 % Credit to StackOverflow and author Ishq for file parser

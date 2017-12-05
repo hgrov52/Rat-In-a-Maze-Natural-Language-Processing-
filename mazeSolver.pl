@@ -1,6 +1,6 @@
 :- module(mazeSolver, [main/0]).
 :- use_module(mazeInfo,[info/3, wall/2, button/3, num_buttons/1, start/2, goal/2]).
-
+:- use_module('NLParser',[interpretValidSentence/4]).
 
 isA(a).
 isC(c).
@@ -151,7 +151,15 @@ printLastPath(X,Y,Path,Stream) :-
 	close(Stream),
 	halt().
 
-%NLMover(Type)
+nLMover(Sent,Stream):-
+	mazeInfo:start(X,Y),
+	'NLParser':interpretValidSentence(Sent,X,Y,Stream),
+
+	write("").
+
+nLMover(Sent,StartX,StartY,Stream):-
+	write("Mover").
+
 
 
 % Will there be boards without buttons?

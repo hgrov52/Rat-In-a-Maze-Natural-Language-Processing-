@@ -1,11 +1,4 @@
-Valid move
-Valid move
-Valid move
-Valid move
-Valid move
 Not a valid sentence
-Valid move
-Valid move
 Not a valid sentence
 Not a valid sentence
 Not a valid sentence

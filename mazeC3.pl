@@ -9,7 +9,6 @@ wall(1,1).
 wall(2,1).
 wall(3,1).
 
-wall(2,2).
 wall(5,2).
 
 wall(1,3).

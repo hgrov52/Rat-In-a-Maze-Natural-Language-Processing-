@@ -22,7 +22,7 @@ isValid(X,Y,LastX,LastY,Path,ButtonNum) :-
 	notEqualToLastLoc(X,Y,LastX,LastY),
 	(member([X,Y],Path)->false;write("")),
 	(mazeInfo:wall(X,Y)->false;write("")),
-	(mazeInfo:button(X,Y,BNum)->(BNum=:=ButtonNum->write("");false);write("")),
+	(mazeInfo:button(X,Y,BNum)->(BNum>ButtonNum->false;write(""));write("")),
 	
 	true.
 

@@ -52,16 +52,12 @@ listVerbArticles(["the"]).
 listVerbDirectionalObjects(["cells","cell","squares","square"]).
 listVerbSingleObjects(["button"]).
 
+% begins the parsing but also keeps track of the rats movements 
+% NewX and NewY are set in interpretValidSentence
 parseParagraph([],_,_,_).
 parseParagraph(Para,StartX,StartY,Stream):-
     Para = [Sentence|Tail],
-
-
     parseSentence(Sentence,StartX,StartY,NewX,NewY,Stream),nl,
-
-    
-
-
     parseParagraph(Tail,NewX,NewY,Stream).
 
 makeTrue(true).
@@ -69,6 +65,8 @@ makeFalse(false).
 not(X):-
     (X->false;true).
 
+% parses the sentence to determine if its a valid sentence. If its not,
+% write that its not and return, but if it is send it to interpretValidSentence
 parseSentence([],_,_,_).
 parseSentence(X,StartX,StartY,NewX,NewY,Stream):-
     length(X,ListLength),
@@ -206,7 +204,7 @@ parseSentence(X,StartX,StartY,NewX,NewY,Stream):-
                     );
                     % Two isnt a subject so not a valid sentence
                     %makeFalse(Valid3)
-                    %write("No Subject")
+                    %write("No Subject in Short List"),
                     format(Stream,"Not a valid sentence~n",[])
                 );
                 % One isnt a subject or article so not a valid sentence
@@ -220,7 +218,10 @@ parseSentence(X,StartX,StartY,NewX,NewY,Stream):-
 
 % can he push a button if theres no button where hes standing?
 
-
+% goes through the sentence to see whether the command is 
+% to push the button or to move the rat to another spot. It 
+% uses isValidNL from mazeSolver to determine if the move is valid
+% All sentences passed to this function are assumed valid.
 interpretValidSentence([],_,_,_,_,_).
 interpretValidSentence(Sent,StartX,StartY,NewX,NewY,Stream):-
     format("~w ~n ~w,~w~n",[Sent,StartX,StartY]),
@@ -242,7 +243,7 @@ interpretValidSentence(Sent,StartX,StartY,NewX,NewY,Stream):-
         )    
     ).
 
-
+% see if the push buttom command is a valid move
 pushButton(X,Y,NewX,NewY,Stream):-
     (mazeSolver:getButtonCors(X,Y)->format(Stream,"Valid move~n",[]),
         format("Valid move pushed button~n",[]),
@@ -254,15 +255,17 @@ pushButton(X,Y,NewX,NewY,Stream):-
         halt()
     ).
 
-
+% parse the sentence for the integer to move in a direction
 findNumber([H|T],Num):-
     (number_string(Num,H)->write("");findNumber(T,Num)).
 
-
+% list of predicates to use in findNewCoordinates
 dirUp("up").
 dirDown("down").
 dirRight("right").
 dirLeft("left").
+
+% finds coordinates that the command is trying to reach and sets it to NewX and NewY
 findNewCoordinates([],_,_,_).
 findNewCoordinates([H|T],X,Y,NewX,NewY,Num):-
     (dirUp(H)->NewY is Y-Num,NewX is X

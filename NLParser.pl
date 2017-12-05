@@ -1,5 +1,5 @@
 :- module('NLParser',[main/0]).
-:- use_module(mazeSolver,[nLMover/2,nLMover/4]).
+:- use_module(mazeSolver,[getStartCors/2,isValidNL/4]).
 
 
 main :-
@@ -16,8 +16,8 @@ main :-
     lines_to_words(Lines, Words),
 
 
-    
-    parseParagraph(Words,Stream),
+    mazeSolver:getStartCors(X,Y),
+    parseParagraph(Words,X,Y,Stream),
     %catch(tester(Words),error(E,C),(writeln(E:C),false)),
 
 
@@ -51,19 +51,23 @@ listVerbArticles(["the"]).
 listVerbDirectionalObjects(["cells","cell","squares","square"]).
 listVerbSingleObjects(["button"]).
 
-parseParagraph([],_).
-parseParagraph(Para,Stream):-
+parseParagraph([],_,_,_).
+parseParagraph(Para,StartX,StartY,Stream):-
     Para = [Sentence|Tail],
-    parseSentence(Sentence,Stream),nl,
-    parseParagraph(Tail,Stream).
+    parseSentence(Sentence,StartX,StartY,NewX,NewY,Stream),nl,
+
+    
+
+
+    parseParagraph(Tail,NewX,NewY,Stream).
 
 makeTrue(true).
 makeFalse(false).
 not(X):-
     (X->false;true).
 
-parseSentence([],_).
-parseSentence(X,Stream):-
+parseSentence([],_,_,_).
+parseSentence(X,StartX,StartY,NewX,NewY,Stream):-
     length(X,ListLength),
     (ListLength>3,ListLength<7 ->
         X     = [One|Temp1],
@@ -106,7 +110,7 @@ parseSentence(X,Stream):-
                             (not(SixWords)->format(Stream,"Not a valid sentence~n",[])
                                 ;
                                 %write(Stream,"Valid Sentence"),
-                                interpretValidSentence(X,Stream)
+                                interpretValidSentence(X,StartX,StartY,NewX,NewY,Stream)
                             );
                             % Five is not a directoion, invalid sentence
                             %write("No Direction")
@@ -124,7 +128,7 @@ parseSentence(X,Stream):-
                             (not(FiveWords)->format(Stream,"Not a valid sentence~n",[])
                                 ;
                                 %write(Stream,"Valid Sentence"),
-                                interpretValidSentence(X,Stream)
+                                interpretValidSentence(X,StartX,StartY,NewX,NewY,Stream)
                             )
                         );
                         % Not a valid sentence
@@ -159,7 +163,7 @@ parseSentence(X,Stream):-
                                     (not(Empty)->write("")
                                         ;
                                         %write(Stream,"Valid Sentence"),
-                                        interpretValidSentence(X,Stream)
+                                        interpretValidSentence(X,StartX,StartY,NewX,NewY,Stream)
                                     );
                                     % Six is not a directoion, invalid sentence
                                     %write("No Direction")
@@ -179,7 +183,7 @@ parseSentence(X,Stream):-
                                         format(Stream,"Not a valid sentence~n",[])
                                         ;
                                         %write("Valid Sentence"),
-                                        interpretValidSentence(X,Stream)
+                                        interpretValidSentence(X,StartX,StartY,NewX,NewY,Stream)
                                     )
                                 );
                                 % Not a valid sentence
@@ -210,22 +214,57 @@ parseSentence(X,Stream):-
     write("").
 
 % can he push a button if theres no button where hes standing?
-interpretValidSentence([],_).
-interpretValidSentence(Sent,Stream):-
-    mazeSolver:nLMover(Sent,Stream).
+
+
+interpretValidSentence([],_,_,_).
+interpretValidSentence(Sent,StartX,StartY,NewX,NewY,Stream):-
+    
+    (member("button",Sent)-> pushButton(StartX,StartY,Stream),
+        NewX is StartX,NewY is StartY
+        ;
+        % moving rat to diff location
+        findNumber(Sent,Num),
+        findNewCoordinates(Sent,StartX,StartY,NewX,NewY,Num),
+        format("Move from ~w,~w to ~w,~w~n",[StartX,StartY,EndX,EndY]),
+        (mazeSolver:isValidNL(StartX,StartY,EndX,EndY)->
+            format(Stream,"Valid move~n",[]),
+            format("Valid move, changing coordinates to ~w,~w",[EndX,EndY]),
+            NewX is EndX,NewY is EndY
+            ;
+            format(Stream,"Not a valid move~n",[]),
+            write("Not a valid move"),
+            NewX is StartX,NewY is StartY
+        )    
+    ).
 
     
-    
-interpretValidSentence(Sent,StartX,StartY,Stream):-
-    %format(Stream,"Valid move~n",[]).
-    (member("button",Sent)-> write("button"),nl
-        ;
-        findNumber(Sent,Num),
-        write(Num),nl
-    ).
+pushButton(X,Y,Stream):-
+    format("Push button at ~w,~w",[X,Y]).
+
 
 findNumber([H|T],Num):-
     (number_string(Num,H)->write("");findNumber(T,Num)).
+
+
+dirUp("up").
+dirDown("down").
+dirRight("right").
+dirLeft("left").
+findNewCoordinates([],_,_,_).
+findNewCoordinates([H|T],X,Y,NewX,NewY,Num):-
+    (dirUp(H)->NewY is Y-Num,NewX is X
+        ;
+        (dirDown(H)->NewY is Y+Num, NewX is X
+            ;
+            (dirRight(H)->NewX is X+Num,NewY is Y
+                ;
+                (dirLeft(H)->NewX is X-Num,NewY is Y
+                    ;
+                    findNewCoordinates(T,X,Y,NewX,NewY,Num)
+                )
+            )
+        )    
+    ).
 
 
 % Credit to StackOverflow and author Ishq for file parser

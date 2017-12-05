@@ -26,6 +26,45 @@ isValid(X,Y,LastX,LastY,Path,ButtonNum) :-
 	
 	true.
 
+isValidNL(StartX,StartY,EndX,EndY):-
+	mazeInfo:info(W,H,_),
+
+	%boundaries
+	(EndX < 0   ->false;write("")),
+	(EndX > W-1 ->false;write("")),
+	(EndY < 0   ->false;write("")),
+	(EndY > H-1 ->false;write("")),
+
+	%wall in between 
+	(wallBetween(StartX,StartY,EndX,EndY)->false;write("")),
+
+	true.
+
+wallBetween(X,Y,A,B):-
+	(X=:=A,Y=:=B->false
+		;
+		(X=:=A->
+			%iterate Y
+			(Y<B->
+				NewY is Y+1,
+				(wall(X,NewY)->true;wallBetween(X,NewY,A,B))
+				;
+				NewY is Y-1,
+				(wall(X,NewY)->true;wallBetween(X,NewY,A,B))
+			)
+			;
+			%iterate X
+			(X<A->
+				NewX is X+1,
+				(wall(NewX,Y)->true;wallBetween(NewX,Y,A,B))
+				;
+				NewX is X-1,
+				(wall(NewX,Y)->true;wallBetween(NewX,Y,A,B))
+			)
+		)
+	).
+
+
 
 inc(X,X1) :-
 	X1 is X+1.
@@ -151,16 +190,33 @@ printLastPath(X,Y,Path,Stream) :-
 	close(Stream),
 	halt().
 
-nLMover(Sent,Stream):-
-	mazeInfo:start(X,Y),
-	'NLParser':interpretValidSentence(Sent,X,Y,Stream),
+getStartCors(X,Y):-
+	mazeInfo:start(X,Y).
+/*
+% used for a button push command
+nLMoverb(StartX,StartY,Stream):-
+	%format("Pushing button at ~w,~w~n",[StartX,StartY]),
+	
+	(mazeInfo:button(StartX,StartY,ID)->format(Stream,"Valid move~n",[]),
+		write("Valid move"),nl
+		;
+		write("Not a valid move"),nl,
+		format(Stream,"Not a valid move~n",[])
+	).
 
-	write("").
-
-nLMover(Sent,StartX,StartY,Stream):-
-	write("Mover").
-
-
+% used for moving einstein around
+nLMover2(StartX,StartY,EndX,EndY,Stream):-
+	
+	format("Move from ~w,~w to ~w,~w~n",[StartX,StartY,EndX,EndY]),
+	(isValidNL(StartX,StartY,EndX,EndY)->
+		format(Stream,"Valid move~n",[]),
+		format("Valid move, changing coordinates to ~w,~w",[EndX,EndY]),
+		
+		;
+		format(Stream,"Not a valid move~n",[]),
+		write("Not a valid move")
+	).
+*/
 
 % Will there be boards without buttons?
 % will there ever be a b or c type board with no buttons?

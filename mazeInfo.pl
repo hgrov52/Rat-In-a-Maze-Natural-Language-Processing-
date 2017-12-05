@@ -1,31 +1,22 @@
 :- module(mazeInfo, [info/3, wall/2, button/3, num_buttons/1, start/2, goal/2]).
 
+info(5, 5, c).
 
-info(6, 6, c).
-
-wall(4,0).
-
+wall(0,4).
 wall(1,1).
+wall(1,4).
 wall(2,1).
-wall(3,1).
-
-wall(2,2).
-wall(5,2).
-
-wall(1,3).
 wall(2,3).
+wall(2,4).
+wall(3,1).
 wall(4,3).
-
 wall(4,4).
 
-wall(0,5).
+button(0,0,2).
+button(0,3,1).
 
-button(0,2,1).
-button(1,0,2).
-button(1,2,3).
+num_buttons(2).
 
-num_buttons(3).
+start(3,4).
 
-start(4,1).
-
-goal(5,3).
+goal(1,0).

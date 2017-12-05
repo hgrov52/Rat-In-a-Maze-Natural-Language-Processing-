@@ -195,31 +195,3 @@ getStartCors(X,Y):-
 
 getButtonCors(X,Y):-
 	(mazeInfo:button(X,Y,_)->true;false).
-/*
-% used for a button push command
-nLMoverb(StartX,StartY,Stream):-
-	%format("Pushing button at ~w,~w~n",[StartX,StartY]),
-	
-	(mazeInfo:button(StartX,StartY,ID)->format(Stream,"Valid move~n",[]),
-		write("Valid move"),nl
-		;
-		write("Not a valid move"),nl,
-		format(Stream,"Not a valid move~n",[])
-	).
-
-% used for moving einstein around
-nLMover2(StartX,StartY,EndX,EndY,Stream):-
-	
-	format("Move from ~w,~w to ~w,~w~n",[StartX,StartY,EndX,EndY]),
-	(isValidNL(StartX,StartY,EndX,EndY)->
-		format(Stream,"Valid move~n",[]),
-		format("Valid move, changing coordinates to ~w,~w",[EndX,EndY]),
-		
-		;
-		format(Stream,"Not a valid move~n",[]),
-		write("Not a valid move")
-	).
-*/
-
-% Will there be boards without buttons?
-% will there ever be a b or c type board with no buttons?

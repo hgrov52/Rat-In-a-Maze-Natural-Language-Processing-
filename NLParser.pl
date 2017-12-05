@@ -15,7 +15,7 @@ main :-
 
 
     
-    parseParagraph(Words),
+    parseParagraph(Words,Stream),
     %catch(tester(Words),error(E,C),(writeln(E:C),false)),
 
 
@@ -49,20 +49,19 @@ listVerbArticles(["the"]).
 listVerbDirectionalObjects(["cells","cell","squares","square"]).
 listVerbSingleObjects(["button"]).
 
-parseParagraph([]).
-parseParagraph(Para):-
+parseParagraph([],_).
+parseParagraph(Para,Stream):-
     Para = [Sentence|Tail],
-    write(Sentence),nl,
-    parseSentence(Sentence),nl,
-    parseParagraph(Tail).
+    parseSentence(Sentence,Stream),nl,
+    parseParagraph(Tail,Stream).
 
 makeTrue(true).
 makeFalse(false).
 not(X):-
     (X->false;true).
 
-parseSentence([]).
-parseSentence(X):-
+parseSentence([],_).
+parseSentence(X,Stream):-
     length(X,ListLength),
     (ListLength>3,ListLength<7 ->
         X     = [One|Temp1],
@@ -102,30 +101,33 @@ parseSentence(X):-
                     (member(Four,VDO)->
                         % Five must be a Direction
                         (member(Five,D)->
-                            (not(SixWords)->write("Too many words")
+                            (not(SixWords)->format(Stream,"Not a valid sentence~n",[])
                                 ;
-                                write("Valid Sentence"),
-                                interpretValidSentence(X)
+                                %write(Stream,"Valid Sentence"),
+                                interpretValidSentence(X,Stream)
                             );
                             % Five is not a directoion, invalid sentence
-                            write("No Direction")
+                            %write("No Direction")
+                            format(Stream,"Not a valid sentence~n",[])
                         );
                         % Four is not a Directional Object so invalid sentence
-                        write("No Directional Object")
+                        %write("No Directional Object")
+                        format(Stream,"Not a valid sentence~n",[])
                     );
                     % Three was not a number so it must be in listVerbArticles
                     (member(Three,VA)->
                         %Four must be in listVerbSingleObjects
                         (member(Four,VO)->
                             % valid as long as no word follows
-                            (not(FiveWords)->write("Too many words")
+                            (not(FiveWords)->format(Stream,"Not a valid sentence~n",[])
                                 ;
-                                write("Valid Sentence"),
-                                interpretValidSentence(X)
+                                %write(Stream,"Valid Sentence"),
+                                interpretValidSentence(X,Stream)
                             )
                         );
                         % Not a valid sentence
-                        write("No Verb Article")
+                        %write("No Verb Article")
+                        format(Stream,"Not a valid sentence~n",[])
                     )
                 )
 
@@ -133,7 +135,8 @@ parseSentence(X):-
                 ;
                 % Two is not a verb so not a valid sentence
                 %makeFalse(Valid4)
-                write("No Verb")
+                %write("No Verb")
+                format(Stream,"Not a valid sentence~n",[])
             );
             % One is not a subject, so must be an listSubjectPhraseArticles
             (member(One,LSA)->
@@ -151,30 +154,35 @@ parseSentence(X):-
                             (member(Five,VDO)->
                                 % Six must be a Direction
                                 (member(Six,D)->
-                                    (not(Empty)->write("10")
+                                    (not(Empty)->write("")
                                         ;
-                                        write("Valid Sentence"),
-                                        interpretValidSentence(X)
+                                        %write(Stream,"Valid Sentence"),
+                                        interpretValidSentence(X,Stream)
                                     );
                                     % Six is not a directoion, invalid sentence
-                                    write("No Direction")
+                                    %write("No Direction")
+                                    write("Not a valid sentence")
                                 );
                                 % Five is not a Directional Object so invalid sentence
-                                write("No Directional Object")
+                                %write("No Directional Object")
+                                format(Stream,"Not a valid sentence~n",[])
                             );
                             % Four was not a number so it must be in listVerbArticles
                             (member(Four,VA)->
                                 %Five must be in listVerbSingleObjects
                                 (member(Five,VO)->
                                     % valid as long as no word follows
-                                    (not(Empty)->write("13")
+                                    (not(Empty)->
+                                        %write("Too many words")
+                                        format(Stream,"Not a valid sentence~n",[])
                                         ;
-                                        write("Valid Sentence"),
-                                        interpretValidSentence(X)
+                                        %write("Valid Sentence"),
+                                        interpretValidSentence(X,Stream)
                                     )
                                 );
                                 % Not a valid sentence
-                                write("No Verb Article")
+                                %write("No Verb Article")
+                                format(Stream,"Not a valid sentence~n",[])
                             )
                         )
 
@@ -182,25 +190,29 @@ parseSentence(X):-
                         ;
                         % Three is not a verb so not a valid sentence
                         %makeFalse(Valid5)
-                        write("No Verb")
+                        %write("No Verb")
+                        format(Stream,"Not a valid sentence~n",[])
                     );
                     % Two isnt a subject so not a valid sentence
                     %makeFalse(Valid3)
-                    write("No Subject")
+                    %write("No Subject")
+                    format(Stream,"Not a valid sentence~n",[])
                 );
                 % One isnt a subject or article so not a valid sentence
                 %makeFalse(Valid2)
-                write("No Subject or Article")
+                %write("No Subject or Article")
+                format(Stream,"Not a valid sentence~n",[])
             )
         )
-    ;write("Not a Valid Sentence")),
-    write(""),nl.
+    ;format(Stream,"Not a valid sentence~n",[])),
+    write("").
 
 % can he push a button if theres no button where hes standing?
-interpretValidSentence([]).
-interpretValidSentence(Sent):-
+interpretValidSentence([],_).
+interpretValidSentence(Sent,Stream):-
     %(member("button")->)
-    write("").
+    
+    format(Stream,"Valid move~n",[]).
     
 
 

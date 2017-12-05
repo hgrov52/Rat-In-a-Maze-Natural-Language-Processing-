@@ -1,7 +1,6 @@
-"a einstein ran 2 squares up".
 "the rat ran 2 squares up".
 "it moved 3 squares left".
-"einstein moved 1 cell down".
+"a einstein moved 1 cell down".
 "the rat pushed the button".
 "a rodent scurried 3 squares up".
 "he pushed the button".
